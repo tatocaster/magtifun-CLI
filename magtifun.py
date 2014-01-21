@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import urllib,urllib2,cookielib,sys
 
 cookie_jar = cookielib.CookieJar()
