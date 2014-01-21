@@ -1,4 +1,4 @@
-import urllib,urllib2,cookielib
+import urllib,urllib2,cookielib,sys
 
 cookie_jar = cookielib.CookieJar()
 opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie_jar))
@@ -11,10 +11,8 @@ req = urllib2.Request(url_1, data)
 rsp = urllib2.urlopen(req)
 
 url_2 = 'http://www.magtifun.ge/scripts/sms_send.php'
-number = input('Type a number here: ')
-number = int(number)
-body = raw_input('message body: ')
-values = dict(recipients=number, message_body=body)
+number = int(sys.argv[1])
+values = dict(recipients=number, message_body=sys.argv[2])
 data = urllib.urlencode(values)
 req = urllib2.Request(url_2,data)
 rsp = urllib2.urlopen(req)
