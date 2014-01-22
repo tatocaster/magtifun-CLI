@@ -10,7 +10,6 @@ import os
 # App directory
 localDir = os.path.expanduser("~") + "/.local/share/magtifun"
 localAuthFile = localDir + "/credentials.json"
-print localDir
 
 # URLs used in requests
 reqUrls = dict(
@@ -32,6 +31,8 @@ def routeCommand(cmd):
 	elif (cmd == 'logout'):
 		logout()
 	elif (cmd == 'send'):
+		# Get number and message
+		# this is first variant, without '--to', '--msg'
 		try:
 			number  = sys.argv[2]
 			message = sys.argv[3]
@@ -39,12 +40,17 @@ def routeCommand(cmd):
 			error("Number and/or message is not defined")
 			print "type 'magtifun --help' for help"
 		else:
-			send(number, message)
+			sendSms(number, message)
 	else:
 		error("Invalid operation " + cmd)
 	return
 
 def sendSms(number, message):
+	if not os.path.isfile(localAuthFile):
+		if prompt("You are currently logged out. Login?", 1):
+			routeCommand('login')
+		else:
+			return
 	number = int(number)
 	smsPostData = dict(
 		recipients = number,
@@ -52,7 +58,7 @@ def sendSms(number, message):
 	smsPostDataStr = urllib.urlencode(smsPostData)
 	req = urllib2.Request(url_1, data)
 	res = urllib2.urlopen(req)
-	print r
+	print res
 	return # return boolean status
 
 def login(username, password):
@@ -79,7 +85,7 @@ def login(username, password):
 
 def logout():
 	if os.path.isfile(localAuthFile):
-		os.remove(localAuthFile)
+		os.remove(localAuthFile) # TODO make this silent
 	else:
 		print("Error: %s file not found" % localAuthFile)
 	return
@@ -98,7 +104,15 @@ def error(message):
 	print "E: " + message
 	return
 
-##########################
+def prompt(message, defaultY):
+	opts = " [Y/n]" if defaultY else " [y/N]"
+	answer = raw_input(message + opts)
+	if defaultY:
+		return (answer <> "N" and answer <> "n")
+	else:
+		return (answer == "Y" or answer == "y")
+
+############
 # Main point
 try:
 	inCmd = sys.argv[1]
