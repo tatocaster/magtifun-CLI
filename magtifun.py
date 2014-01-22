@@ -10,7 +10,7 @@ import os
 # App directory
 localDir = os.path.expanduser("~") + "/.local/share/magtifun"
 localAuthFile = localDir + "/credentials.json"
-logData = True;
+logData = False; # Set this True for development
 
 # URLs used in requests
 reqUrls = dict(
@@ -138,11 +138,13 @@ def logout():
 	return
 
 def man():
-	print """magtifun 0.1.0 for Linux
-Usage: magtifun send number message
+	print """magtifun 0.1.1 for Linux
+Usage: magtifun login|logout|send
+       magtifun send number message
        magtifun command [options]
 
-magtifun is a simple command line interface for sending short text messages via Magti's free sms servce called MagtiFun.
+magtifun is a simple command line interface for sending
+short text messages via free sms servce called MagtiFun.
 	"""
 	return
 
