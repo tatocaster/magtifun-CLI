@@ -1,19 +1,110 @@
 #!/usr/bin/env python
-import urllib,urllib2,cookielib,sys
+import urllib
+import urllib2
+import cookielib
+import sys
+import io
+import json
+import os
 
-cookie_jar = cookielib.CookieJar()
-opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookie_jar))
+# App directory
+localDir = os.path.expanduser("~") + "/.local/share/magtifun"
+localAuthFile = localDir + "/credentials.json"
+print localDir
+
+# URLs used in requests
+reqUrls = dict(
+	login = 'http://www.magtifun.ge/index.php?page=11&lang=ge',
+	send  = 'http://www.magtifun.ge/scripts/sms_send.php')
+
+# CookieJar and opener
+cookieJar = cookielib.CookieJar()
+opener = urllib2.build_opener(
+	urllib2.HTTPCookieProcessor(cookieJar))
 urllib2.install_opener(opener)
 
-url_1 = 'http://www.magtifun.ge/index.php?page=11&lang=ge'
-values = dict(password='password', user='username', act='1')
-data = urllib.urlencode(values)
-req = urllib2.Request(url_1, data)
-rsp = urllib2.urlopen(req)
+# Command router
+def routeCommand(cmd):
+	if (cmd == 'login'):
+		username = raw_input("Enter username: ")
+		password = raw_input("Enter password: ")
+		login(username, password)
+	elif (cmd == 'logout'):
+		logout()
+	elif (cmd == 'send'):
+		try:
+			number  = sys.argv[2]
+			message = sys.argv[3]
+		except IndexError:
+			error("Number and/or message is not defined")
+			print "type 'magtifun --help' for help"
+		else:
+			send(number, message)
+	else:
+		error("Invalid operation " + cmd)
+	return
 
-url_2 = 'http://www.magtifun.ge/scripts/sms_send.php'
-number = int(sys.argv[1])
-values = dict(recipients=number, message_body=sys.argv[2])
-data = urllib.urlencode(values)
-req = urllib2.Request(url_2,data)
-rsp = urllib2.urlopen(req)
+def sendSms(number, message):
+	number = int(number)
+	smsPostData = dict(
+		recipients = number,
+		message_body = message)
+	smsPostDataStr = urllib.urlencode(smsPostData)
+	req = urllib2.Request(url_1, data)
+	res = urllib2.urlopen(req)
+	print r
+	return # return boolean status
+
+def login(username, password):
+	if not os.path.exists(localDir):
+		try:
+			os.makedirs(localDir)
+		except OSError as exception:
+			if exception.errno != errno.EEXIST:
+				raise
+	authFileData = dict(
+		username = username,
+		password = password)
+	authPostData = dict(
+		user = 'username',
+		password = 'password',
+		act = '1')
+	with open(localAuthFile, 'w+') as outFile:
+		json.dump(authFileData, outFile)
+	authPostDataStr = urllib.urlencode(authPostData)
+	req = urllib2.Request(reqUrls['login'], authPostDataStr)
+	res = urllib2.urlopen(req)
+	# TODO check if login was successfull
+	return # return boolean login status
+
+def logout():
+	if os.path.isfile(localAuthFile):
+		os.remove(localAuthFile)
+	else:
+		print("Error: %s file not found" % localAuthFile)
+	return
+
+def man():
+	print """magtifun 0.1.0 for Linux
+Usage: magtifun send number message
+       magtifun command [options]
+
+magtifun is a simple command line interface for sending short text messages via Magti's free sms servce called MagtiFun.
+	"""
+	return
+
+# Display an error
+def error(message):
+	print "E: " + message
+	return
+
+##########################
+# Main point
+try:
+	inCmd = sys.argv[1]
+except IndexError:
+	man()
+else:
+	routeCommand(inCmd)
+finally:
+	pass
