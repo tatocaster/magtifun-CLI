@@ -116,7 +116,7 @@ def login(username, password):
 	authFileData = dict(
 		username = username,
 		password = password)
-	# authFileData = dict(    ამის decode იქნება გასკეთებელი. ან md5 გავაკეთოთ
+	# authFileData = dict(     need to decode . or  md5 will be fine
 	# 	username = base64.b64encode(username),
 	# 	password = base64.b64encode(password))
 	authPostData = dict(
