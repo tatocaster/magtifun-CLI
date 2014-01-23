@@ -7,6 +7,7 @@ import io
 import json
 import os
 import getpass
+import base64
 
 # App directory
 localDir = os.path.expanduser("~") + "/.local/share/magtifun"
@@ -115,6 +116,9 @@ def login(username, password):
 	authFileData = dict(
 		username = username,
 		password = password)
+	# authFileData = dict(    ამის decode იქნება გასკეთებელი. ან md5 გავაკეთოთ
+	# 	username = base64.b64encode(username),
+	# 	password = base64.b64encode(password))
 	authPostData = dict(
 		user = username,
 		password = password,
