@@ -6,6 +6,7 @@ import sys
 import io
 import json
 import os
+import getpass
 
 # App directory
 localDir = os.path.expanduser("~") + "/.local/share/magtifun"
@@ -28,7 +29,8 @@ def routeCommand(cmd):
 	log("routing command: " + cmd)
 	if (cmd == 'login'):
 		username = raw_input("Enter username: ")
-		password = raw_input("Enter password: ")
+		# password = raw_input("Enter password: ")
+		password = getpass.getpass("password: ")
 		log("auth input: " + username + ":" + password)
 		login(username, password)
 	elif (cmd == 'logout'):
